@@ -36,7 +36,7 @@ var Router = (function () {
                     type = funcs.E.PATH;
                 }
 
-                return { type, component };
+                return { type: type, component: component };
             });
 
             return _path;
@@ -154,7 +154,7 @@ var Router = (function () {
         add: function (route, callback) {
             this.routes.push({
                 route: funcs.parse(route),
-                callback
+                callback: callback
             });
         },
         use: function (callback) {
