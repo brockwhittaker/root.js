@@ -100,16 +100,10 @@ var Router = (function () {
             };
 
             run();
-        }
-    };
+        },
 
-    var Router = function () {
-        this.routes = [];
-        this.middleware = [];
-
-        // add with `addEventListener` to not disrupt other possible events bound
-        // to `onhashchange`.
-        window.addEventListener("hashchange", (function (e) {
+        // the `this` arg should be replaced with the prototype's `this`.
+        resolve_hashchange: function (e) {
             // the `window.location.hash` isn't actually the hash necessarily currently
             // in the browser. This happens when you change the hash multiple times
             // successively. To truly capture the state of the hashchange, we need to
@@ -139,12 +133,19 @@ var Router = (function () {
                         // transmit original event and `this` arg.
                         this.routes[x].callback.call(this, e);
                     }).bind(this));
-
-                    return true;
                 }
             }
-            return false;
-        }).bind(this));
+        },
+    };
+
+    var Router = function () {
+        this.routes = [];
+        this.middleware = [];
+
+        // add with `addEventListener` to not disrupt other possible events bound
+        // to `onhashchange`.
+        window.addEventListener("hashchange", funcs.resolve_hashchange.bind(this));
+
     };
 
     Router.prototype = {
@@ -160,6 +161,10 @@ var Router = (function () {
         use: function (callback) {
             this.middleware.push(callback);
         },
+        init: function () {
+            funcs.resolve_hashchange.call(this, { newURL: window.location.href });
+            return this;
+        }
     };
 
     return Router;
