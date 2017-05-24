@@ -71,3 +71,16 @@ router.add("/weather/:city/*", (e) => {
     // /weather/Berkeley/a/b/c/d/e/ => { city: "Berkeley", endHash: "/b/c/d/e" }
 });
 ```
+
+## Middleware
+
+The **root.js** library supports middleware that works similarly to express.js. You can use it like below.
+
+```js
+router.use((e, next) => {
+    console.log(`PATH: "${e.hash}"`);
+    next();
+});
+```
+
+If you want to intercept requests before reaching their routes, do not execute the `next()` function. This will prevent any route from being reached.
