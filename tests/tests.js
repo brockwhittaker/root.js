@@ -2,18 +2,6 @@ let log = console.table;
 
 let router = new Router();
 
-window.location.hash = "apple";
-window.location.hash = "orange";
-window.location.hash = "";
-window.location.hash = "city/Berkeley";
-window.location.hash = "book/Harry Potter/JK Rowling/Portland";
-window.location.hash = "settings";
-window.location.hash = "settings/organization-settings";
-window.location.hash = "narrow/stream";
-window.location.hash = "narrow/does/something/cool";
-window.location.hash = "narrow/a/b";
-window.location.hash = "narrow/a";
-
 router.use((e, next) => {
     console.log("MIDDLEWARE", e.params, e.hash, e.endHash);
     next();
@@ -60,3 +48,16 @@ router.add("/narrow/*/*", (e) => {
 router.add("/narrow/*", (e) => {
     console.log(e.params, e.hash);
 });
+
+window.location.hash = "apple";
+window.location.hash = "orange";
+window.location.hash = "";
+window.location.hash = "city/Berkeley";
+window.location.hash = "book/Harry Potter/JK Rowling/Portland";
+window.location.hash = "settings";
+window.location.hash = "settings/organization-settings";
+window.location.hash = "narrow/stream";
+window.location.hash = "narrow/does/something/cool";
+window.location.hash = "narrow/a/b";
+window.location.hash = "narrow/a";
+window.location.hash = "narrow/b";

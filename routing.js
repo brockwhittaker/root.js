@@ -50,7 +50,7 @@ var Router = (function () {
 
             var len = Math.max(path.length, route.length);
 
-            for (var x = 0; x < len; x++) {
+            for (var x = 0; x < len; x += 1) {
                 // if the route exists and the type is a path (hardcoded), then
                 // check if the path exists and is the same to continue.
                 if (route[x] && route[x].type === funcs.E.PATH &&
@@ -87,14 +87,24 @@ var Router = (function () {
             return map;
         },
 
+        // this works similarly to express middleware in that when middleware
+        // should continue, it should execute the `run()` function inside the
+        // function scope to reach either the next piece of middleware or the
+        // route if there is no middleware left.
         run_middleware: function (data, middleware, callback) {
             var counter = 0;
 
+            // this is a function to successfully run when middleware should
+            // continue on to the next step.
             var run = function () {
+                // if there is no more middleware, run the actual route.
                 if (counter === middleware.length) {
                     callback();
+                // otherwise, run the next piece of middleware and expect for
+                // the middleware to call the run function which has access to
+                // the `counter` variable.
                 } else {
-                    counter++;
+                    counter += 1;
                     middleware[counter - 1](data, run);
                 }
             };
@@ -112,8 +122,15 @@ var Router = (function () {
 
             var path = funcs.parse(hash);
 
+            // e: the event of the hashchange.
+            // x: the
+            var run_route = function (e, route) {
+                // transmit original event and `this` arg.
+                route.callback.call(this, e);
+            };
+
             // iterate through each of the routes to find a match.
-            for (var x = 0; x < this.routes.length; x++) {
+            for (var x = 0; x < this.routes.length; x += 1) {
                 // check if the route is valid.
                 // this also will return a map of valid key/value pairs.
                 var map = funcs.compare(this.routes[x].route, path);
@@ -129,10 +146,7 @@ var Router = (function () {
                         delete e.params.__ALL;
                     }
 
-                    funcs.run_middleware(e, this.middleware, (function () {
-                        // transmit original event and `this` arg.
-                        this.routes[x].callback.call(this, e);
-                    }).bind(this));
+                    funcs.run_middleware(e, this.middleware, run_route.bind(this, e, this.routes[x]));
                 }
             }
         },
@@ -155,7 +169,7 @@ var Router = (function () {
         add: function (route, callback) {
             this.routes.push({
                 route: funcs.parse(route),
-                callback: callback
+                callback: callback,
             });
         },
         use: function (callback) {
@@ -164,7 +178,7 @@ var Router = (function () {
         init: function () {
             funcs.resolve_hashchange.call(this, { newURL: window.location.href });
             return this;
-        }
+        },
     };
 
     return Router;
