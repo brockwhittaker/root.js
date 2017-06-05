@@ -1,4 +1,4 @@
-var Router = (function () {
+var Router = function (window) {
     var funcs = {
         // enums to describe the types that a particular path segment can be:
         // - PATH: hardcoded segment such as /users/.
@@ -146,7 +146,9 @@ var Router = (function () {
                         delete e.params.__ALL;
                     }
 
-                    funcs.run_middleware(e, this.middleware, run_route.bind(this, e, this.routes[x]));
+                    funcs.run_middleware(
+                        e, this.middleware, run_route.bind(this, e, this.routes[x])
+                    );
                 }
             }
         },
@@ -159,12 +161,16 @@ var Router = (function () {
         // add with `addEventListener` to not disrupt other possible events bound
         // to `onhashchange`.
         window.addEventListener("hashchange", funcs.resolve_hashchange.bind(this));
-
     };
 
     Router.prototype = {
         // allow for users to access the parse function to parse on their own.
         parse: funcs.parse,
+
+        matches: function (route, path) {
+            return funcs.compare(funcs.parse(route), funcs.parse(path));
+        },
+
         // set a new route that runs a particular callback when successfully hit.
         add: function (route, callback) {
             this.routes.push({
@@ -179,7 +185,15 @@ var Router = (function () {
             funcs.resolve_hashchange.call(this, { newURL: window.location.href });
             return this;
         },
+
+        type: funcs.E,
     };
 
     return Router;
-}());
+};
+
+if (typeof window !== "undefined") {
+    Router = Router(window);
+} else if (typeof module !== "undefined") {
+    module.exports = Router;
+}
