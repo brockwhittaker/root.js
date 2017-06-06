@@ -159,8 +159,12 @@ var Router = function (window) {
                     funcs.run_middleware(
                         e, this.middleware, run_route.bind(this, e, this.routes[x])
                     );
+
+                    return;
                 }
             }
+
+            funcs.run_middleware(e, this.middleware, function () {});
         },
     };
 
