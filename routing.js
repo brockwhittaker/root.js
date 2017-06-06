@@ -205,7 +205,7 @@ var Router = function (window) {
             this.middleware.push(callback);
         },
         init: function () {
-            funcs.resolve_hashchange.call(this, { newURL: window.location.href });
+            funcs.resolve_hashchange.call(this, { newURL: window.location.href, initial_load: true });
             return this;
         },
 
