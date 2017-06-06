@@ -188,6 +188,14 @@ var Router = function (window) {
 
         // set a new route that runs a particular callback when successfully hit.
         add: function (route, callback) {
+            if (Array.isArray(route)) {
+                route.forEach((function (r) {
+                    this.add(r, callback);
+                }).bind(this));
+
+                return;
+            }
+
             this.routes.push({
                 route: funcs.parse(route),
                 callback: callback,
