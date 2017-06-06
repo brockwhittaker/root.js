@@ -128,6 +128,8 @@ var Router = function (window) {
                 return a.hash;
             }(e.newURL));
 
+            this.history.push(hash);
+
             var path = funcs.parse(hash);
 
             // e: the event of the hashchange.
@@ -165,6 +167,7 @@ var Router = function (window) {
     var Router = function () {
         this.routes = [];
         this.middleware = [];
+        this.history = [];
 
         // add with `addEventListener` to not disrupt other possible events bound
         // to `onhashchange`.
