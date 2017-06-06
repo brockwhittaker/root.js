@@ -1,4 +1,4 @@
-var Router = function (window) {
+var Router = (function () {
     var funcs = {
         // enums to describe the types that a particular path segment can be:
         // - PATH: hardcoded segment such as /users/.
@@ -168,14 +168,22 @@ var Router = function (window) {
         },
     };
 
-    var Router = function () {
+    var Router = function (win) {
         this.routes = [];
         this.middleware = [];
         this.history = [];
 
+        if (win) {
+            this.__window__ = win;
+        } else if (typeof window !== "undefined") {
+            this.__window__ = window;
+        }
+
         // add with `addEventListener` to not disrupt other possible events bound
         // to `onhashchange`.
-        window.addEventListener("hashchange", funcs.resolve_hashchange.bind(this));
+        this.__window__.addEventListener("hashchange", funcs.resolve_hashchange.bind(this));
+
+        return this;
     };
 
     Router.prototype = {
@@ -189,9 +197,9 @@ var Router = function (window) {
         // set a new route that runs a particular callback when successfully hit.
         add: function (route, callback) {
             if (Array.isArray(route)) {
-                route.forEach((function (r) {
+                route.forEach(function (r) {
                     this.add(r, callback);
-                }).bind(this));
+                }.bind(this));
 
                 return;
             }
@@ -205,7 +213,10 @@ var Router = function (window) {
             this.middleware.push(callback);
         },
         init: function () {
-            funcs.resolve_hashchange.call(this, { newURL: window.location.href, initial_load: true });
+            funcs.resolve_hashchange.call(this, {
+                newURL: this.__window__.location.href,
+                initial_load: true,
+            });
             return this;
         },
 
@@ -213,10 +224,8 @@ var Router = function (window) {
     };
 
     return Router;
-};
+}());
 
-if (typeof window !== "undefined") {
-    Router = Router(window);
-} else if (typeof module !== "undefined") {
+if (typeof module !== "undefined") {
     module.exports = Router;
 }
