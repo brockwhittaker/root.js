@@ -22,7 +22,9 @@ var Router = function (window) {
         // accessed: /users/230 => { type: 0, component: "230" }
         parse: function (path) {
             // remove leading and trailing slashes.
-            var _path = path.replace(/^\/|\/$/, "");
+            var _path = path
+                .replace(/^#/, "")
+                .replace(/^\/|\/$/, "");
 
             // split the path by '/', map over and test whether the segments
             // are declarative variables or hardcoded.
@@ -118,7 +120,13 @@ var Router = function (window) {
             // in the browser. This happens when you change the hash multiple times
             // successively. To truly capture the state of the hashchange, we need to
             // grab the `e.newURL` property.
-            var hash = e.newURL.split(/#/).pop();
+
+            var hash = (function (url) {
+                var a = document.createElement("a");
+                a.href = url;
+
+                return a.hash;
+            }(e.newURL));
 
             var path = funcs.parse(hash);
 
